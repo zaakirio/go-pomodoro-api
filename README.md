@@ -105,3 +105,15 @@ This API provides a RESTful interface for managing pomodoro sessions using Googl
     -   204: No Content (pomodoro deleted successfully)
     -   404: Not Found (pomodoro with specified ID not found)
     -   500: Internal Server Error (database error)
+
+### Models
+
+The API uses the following model for `Pomodoro` objects:
+
+
+```Go
+type Pomodoro struct {
+  ID          string     `json:"id"`
+  StartTime  time.Time  `json:"startTime"`
+  Completed  bool       `json:"completed"`
+}
