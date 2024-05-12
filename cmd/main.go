@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"log"
 
-	firebase "firebase.google.com/go/v4"
+	firebase "cloud.google.com/go/firestore"
+
 	"github.com/labstack/echo/v4"
 	"github.com/zaakirio/go-pomodoro-api/pkg/routes"
 	"google.golang.org/api/option"
@@ -13,21 +15,25 @@ import (
 func main() {
 	e := echo.New()
 
-	opt := option.WithCredentialsFile("firebase.json")
-	app, err := firebase.NewApp(context.Background(), nil, opt)
+	ctx := context.Background()
+	opt := option.WithCredentialsFile("serviceAccountKey.json")
+
+	firestoreClient, err := firebase.NewClient(ctx, "go-pomodoro-api", opt)
 	if err != nil {
 		log.Fatalf("error initializing firebase: %v\n", err)
 	}
 
-	// Get Firestore client
-	firestoreClient, err := app.Firestore(context.Background())
-	if err != nil {
-		log.Fatalf("error getting Firestore client: %v\n", err)
-	}
-
-	// Register routes and pass the Firestore client
 	routes.RegisterRoutes(e, firestoreClient)
+	printRoutes(e)
 
-	// Start the server
 	log.Fatal(e.Start(":8080"))
+}
+
+func printRoutes(e *echo.Echo) {
+	fmt.Println("\033[1;36mRegistered routes:\033[0m")
+	for _, route := range e.Routes() {
+		method := route.Method
+		path := route.Path
+		fmt.Printf("\033[1;36m%-6s ==> %-25s\n", method, path)
+	}
 }
